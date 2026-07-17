@@ -1,4 +1,4 @@
-enum UserRole { farmer, buyer }
+enum UserRole { farmer, buyer, admin }
 
 extension UserRoleX on UserRole {
   String get value => name;
@@ -13,52 +13,52 @@ extension UserRoleX on UserRole {
 
 class AppUser {
   final String id;
-  final String name;
-  final String email;
-  final String? phone;
+  final String businessName;
+  final String contactPerson;
+  final String phoneNumber;
+  final String? locationGps;
   final UserRole role;
-  final String? businessName;
-  final String? location;
-  final bool verified;
-  final bool profileComplete;
+  final bool isVetted;
+  final double averageRating;
+  final String preferredLang;
 
   AppUser({
     required this.id,
-    required this.name,
-    required this.email,
-    this.phone,
+    required this.businessName,
+    required this.contactPerson,
+    required this.phoneNumber,
+    this.locationGps,
     required this.role,
-    this.businessName,
-    this.location,
-    this.verified = false,
-    this.profileComplete = false,
+    this.isVetted = false,
+    this.averageRating = 5.0,
+    this.preferredLang = 'en',
   });
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
       id: map['id'] as String,
-      name: map['name'] as String? ?? '',
-      email: map['email'] as String? ?? '',
-      phone: map['phone'] as String?,
-      role: UserRoleX.fromString(map['role'] as String? ?? 'buyer'),
-      businessName: map['business_name'] as String?,
-      location: map['location'] as String?,
-      verified: map['verified'] as bool? ?? false,
-      profileComplete: map['profile_complete'] as bool? ?? false,
+      businessName: map['business_name'] as String? ?? '',
+      contactPerson: map['contact_person'] as String? ?? '',
+      phoneNumber: map['phone_number'] as String? ?? '',
+      locationGps: map['location_gps'] as String?,
+      role: UserRoleX.fromString(map['user_role'] as String? ?? 'buyer'),
+      isVetted: map['is_vetted'] as bool? ?? false,
+      averageRating: (map['average_rating'] as num?)?.toDouble() ?? 5.0,
+      preferredLang: map['preferred_lang'] as String? ?? 'en',
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'role': role.value,
       'business_name': businessName,
-      'location': location,
-      'verified': verified,
-      'profile_complete': profileComplete,
+      'contact_person': contactPerson,
+      'phone_number': phoneNumber,
+      'location_gps': locationGps,
+      'user_role': role.value,
+      'is_vetted': isVetted,
+      'average_rating': averageRating,
+      'preferred_lang': preferredLang,
     };
   }
 }

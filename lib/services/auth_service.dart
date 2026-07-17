@@ -12,13 +12,12 @@ class AuthService {
   Future<AppUser> signUp({
     required String email,
     required String password,
-    required String name,
+    required String businessName,
+    required String contactPerson,
+    required String phoneNumber,
     required UserRole role,
   }) async {
-    final response = await _client.auth.signUp(
-      email: email,
-      password: password,
-    );
+    final response = await _client.auth.signUp(email: email, password: password);
     final authUser = response.user;
     if (authUser == null) {
       throw Exception('Sign up failed: no user returned.');
@@ -26,22 +25,18 @@ class AuthService {
 
     final appUser = AppUser(
       id: authUser.id,
-      name: name,
-      email: email,
+      businessName: businessName,
+      contactPerson: contactPerson,
+      phoneNumber: phoneNumber,
       role: role,
     );
-    await _client.from('users').insert(appUser.toMap());
+
+    await _client.from('profiles').insert(appUser.toMap());
     return appUser;
   }
 
-  Future<AppUser> signIn({
-    required String email,
-    required String password,
-  }) async {
-    final response = await _client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+  Future<AppUser> signIn({required String email, required String password}) async {
+    final response = await _client.auth.signInWithPassword(email: email, password: password);
     final authUser = response.user;
     if (authUser == null) {
       throw Exception('Sign in failed: invalid credentials.');
@@ -50,25 +45,8 @@ class AuthService {
   }
 
   Future<AppUser> fetchUserProfile(String uid) async {
-    final data = await _client.from('users').select().eq('id', uid).single();
+    final data = await _client.from('profiles').select().eq('id', uid).single();
     return AppUser.fromMap(data);
-  }
-
-  Future<void> completeProfile({
-    required String uid,
-    required String phone,
-    required String businessName,
-    required String location,
-  }) async {
-    await _client
-        .from('users')
-        .update({
-          'phone': phone,
-          'business_name': businessName,
-          'location': location,
-          'profile_complete': true,
-        })
-        .eq('id', uid);
   }
 
   Future<void> signOut() => _client.auth.signOut();

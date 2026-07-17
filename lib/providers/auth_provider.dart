@@ -1,5 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_models.dart';
 import '../services/auth_service.dart';
@@ -42,7 +42,9 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<AppUser?>> {
   Future<void> signUp({
     required String email,
     required String password,
-    required String name,
+    required String businessName,
+    required String contactPerson,
+    required String phoneNumber,
     required UserRole role,
   }) async {
     state = const AsyncValue.loading();
@@ -50,7 +52,9 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<AppUser?>> {
       final user = await _authService.signUp(
         email: email,
         password: password,
-        name: name,
+        businessName: businessName,
+        contactPerson: contactPerson,
+        phoneNumber: phoneNumber,
         role: role,
       );
       state = AsyncValue.data(user);
@@ -71,29 +75,12 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<AppUser?>> {
     }
   }
 
-  Future<void> completeProfile({
-    required String phone,
-    required String businessName,
-    required String location,
-  }) async {
-    final current = state.value;
-    if (current == null) return;
-    await _authService.completeProfile(
-      uid: current.id,
-      phone: phone,
-      businessName: businessName,
-      location: location,
-    );
-    await refresh();
-  }
-
   Future<void> signOut() async {
     await _authService.signOut();
     state = const AsyncValue.data(null);
   }
 }
 
-final currentUserProvider =
-    StateNotifierProvider<CurrentUserNotifier, AsyncValue<AppUser?>>((ref) {
-      return CurrentUserNotifier(ref.watch(authServiceProvider));
-    });
+final currentUserProvider = StateNotifierProvider<CurrentUserNotifier, AsyncValue<AppUser?>>((ref) {
+  return CurrentUserNotifier(ref.watch(authServiceProvider));
+});
